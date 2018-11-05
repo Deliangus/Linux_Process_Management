@@ -1,12 +1,19 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #define SIZE_OF_HASH_TABLE 100
+#define PATH_TO_KNOWN_PROCESS "../classification/known_Process"
+#define PATH_TO_UNKNOWN_PROCESS "../classification/unknown_Process"
+#define PATH_TO_SUCCESS_PROCESS "../classification/known_Process"
+#define PATH_TO_FAILURE_PROCESS "../classification/known_Process"
 struct process_Node
 {
     char * Name;
     int pid;
-    bool status;
-
+    int status;
+    struct process_Node * previous;
+    struct process_Node * next;
 };
 
 struct process_Table
@@ -21,9 +28,9 @@ struct process_Table* load_Table;
 
 int hashing_Process(char*Name);
 
-bool load_unknown_Process();
-bool load_known_Process();
-bool load_success_Process();
-bool load_failure_Process();
+int load_unknown_Process();
+int load_known_Process();
+int load_success_Process();
+int load_failure_Process();
 
-bool load();
+int load();
