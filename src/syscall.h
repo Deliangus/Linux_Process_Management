@@ -5,13 +5,13 @@
   Unload it with "sudo rmmod process.ko".
 */
 
-#include <linux/kernel.h>
 #include <linux/module.h>
 #include <linux/init.h>
 #include <linux/sched.h> // task_struct definition
 #include <asm/unistd.h>
 #include <linux/list.h>
 #include <linux/init_task.h>
+#include <linux/kernel.h>
 
 #ifndef __KERNEL__
 #define __KERNEL__
