@@ -3,6 +3,8 @@
 
 int load()
 {
+    int count = 0;
+
     //Initialize process tables
     load_Table = (struct process_Table*)malloc(sizeof(struct process_Table));
     memset(load_Table->known_Process,NULL,SIZE_OF_HASH_TABLE);
@@ -10,12 +12,14 @@ int load()
     memset(load_Table->success_Process,NULL,SIZE_OF_HASH_TABLE);
     memset(load_Table->failure_Process,NULL,SIZE_OF_HASH_TABLE);
 
-    load_unknown_Process();
-    load_known_Process();
-    load_success_Process();
-    load_failure_Process();
+    count += load_unknown_Process();
+    count += load_known_Process();
+    count += load_success_Process();
+    count += load_failure_Process();
 
     //TO DO: output log
+    
+    return count;
 }
 
 int load_known_Process()
