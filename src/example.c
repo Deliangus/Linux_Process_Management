@@ -1,132 +1,109 @@
-#include <linux/module.h> //needed by all modules
-#include <linux/kernel.h> //needed for KERN_INFO
-#include <linux/sched.h> //defined struct task_struct
-#include <linux/proc_fs.h> //create proc file
-#include <linux/seq_file.h> //use seq_file
-
-#define FILENAME "osexp" //defile proc file name
-
-int myshow(struct seq_file *,void *); 
-int myopen(struct inode *,struct file *);
-
-/* custom the operations to the seq_file */
-static const struct file_operations myops = {
-        .owner = THIS_MODULE,
-        .open = myopen,
-        .read = seq_read,
-        .release = single_release
+#include <linux/init.h>
+#include <linux/module.h>
+#include <linux/kernel.h>
+#include <linux/unistd.h>
+#include <asm/uaccess.h>
+#include <linux/sched.h>
+ 
+#define my_syscall_num 223
+#define sys_call_table_address 0xc15b3000
+ 
+static int counter = 0;
+struct process
+{
+	int pid;
+	int depth;
 };
-/* do when open the seq file */
-int myopen(struct inode *inode,struct file *file){
-    single_open(file,myshow,NULL);//bind seq_file with myshow function
-    return 0;
+ 
+struct process a[512];
+ 
+unsigned int clear_and_return_cr0(void);
+void setback_cr0(unsigned int val);
+asmlinkage long sys_mycall(char __user *buf);
+int orig_cr0;
+unsigned long *sys_call_table = 0;
+static int (*anything_saved)(void);
+ 
+ 
+void processtree(struct task_struct * p,int b)
+{
+	struct list_head * l;
+	a[counter].pid = p -> pid;
+	a[counter].depth = b;
+	counter ++;
+	for(l = p -> children.next; l != &(p->children); l = l->next)
+	{
+		struct task_struct *t = list_entry(l,struct task_struct,sibling);
+		processtree(t,b+1);
+	}
 }
-/* create proc file */
-int init_proc(void){
-    struct proc_dir_entry * myfile;
-    myfile = proc_create(FILENAME,0444,NULL,&myops);//create proc file
-    if(myfile == NULL) //deal with error
-        return -ENOMEM;
-    return 0;
+ 
+unsigned int clear_and_return_cr0(void)
+{
+	unsigned int cr0 = 0;
+	unsigned int ret;
+	asm("movl %%cr0, %%eax":"=a"(cr0));
+	ret = cr0;
+	cr0 &= 0xfffeffff;
+	asm("movl %%eax, %%cr0"::"a"(cr0));
+	return ret;
 }
-/* remove proc file */
-void remove_proc(void){
-    remove_proc_entry(FILENAME,NULL);//remove proc file
-    printk(KERN_INFO "[m] proc file:%s removed\n",FILENAME);//print debug message
+ 
+void setback_cr0(unsigned int val)//读取val的值到eax寄存器，再将eax寄存器的值放入cr0中
+{
+	asm volatile("movl %%eax, %%cr0"::"a"(val));
 }
-
-/*description: output process's info to log */
-int myshow(struct seq_file *file,void *v){
-    int num_running = 0; //the number of process whose status is running
-    int num_interruptible = 0; //the number of process whose status is interruptible
-    int num_uninterruptible = 0; //the ... status is uninterruptible
-    int num_zombie = 0; //the process exited with status zombie
-    int num_stopped = 0; //the ... status is stopped
-    int num_traced = 0; //the ... status is traced
-    int num_dead = 0; //the process has deaded;
-    int num_unknown = 0; //the process whose status is unknown
-
-    int num_total = 0; //the total number of process
-
-    int t_exit_state; //temp var to store task_struct.exit_state
-    int t_state; //temp var to store task_struct.state
-    struct task_struct *p; //pointer to task_struct
-   
-    //printk("[m] All processes' info:\n");//print boot info
-    seq_printf(file,"[m] All processes' info:\n");
-    for(p=&init_task;(p=next_task(p))!=&init_task;){ //go througn the linklist
-        //printk(KERN_INFO "[m] Name:%s Pid:%d State:%ld ParName:%s\n",p->comm,p->pid,p->state,p->real_parent->comm); //print the process's info to log
-        seq_printf(file,"[m] Name:%s Pid:%d State:%ld ParName:%s\n",p->comm,p->pid,p->state,p->real_parent->comm);
-        num_total++; //total number of process plus one
-
-        t_state = p->state; //put p->state to variable t_state
-        t_exit_state = p->exit_state;//similar to above
-
-        if(t_exit_state!=0){ //if the process has exited
-            switch(t_exit_state){
-                case EXIT_ZOMBIE://if the exit state is zombie
-                    num_zombie++;//variable plus one
-                    break; //break switch 
-                case EXIT_DEAD://if the exit state is dead
-                    num_dead++;//variable plus one
-                    break;//break switch
-                default: //other case
-                    break;//break switch
-            }
-        }else{ // if the proess hasn't exited
-            switch(t_state){
-                case TASK_RUNNING://if the state is running
-                    num_running++;//variable plus one
-                    break;//break switch
-                case TASK_INTERRUPTIBLE://state is interruptible
-                    num_interruptible++;//variable plus one
-                    break;//break switch
-                case TASK_UNINTERRUPTIBLE://state is uninterruptible
-                    num_uninterruptible++;//var + 1
-                    break;//break switch
-                case TASK_STOPPED://state is stopped
-                    num_stopped++;//var +1
-                    break;//break switch
-                case TASK_TRACED://state is traced
-                    num_traced++;//var +1
-                    break;//break switch
-                default://other case
-                    num_unknown++;
-                    break;
-            }
-        }
-    }
-    //below instruction is to print the statistics result in above code
-    // printk(KERN_INFO "[m] total tasks: %10d\n",num_total);
-    // printk(KERN_INFO "[m] TASK_RUNNING: %10d\n",num_running);
-    // printk(KERN_INFO "[m] TASK_INTERRUPTIBLE: %10d\n",num_interruptible);
-    // printk(KERN_INFO "[m] TASK_UNINTERRUPTIBLE: %10d\n",num_uninterruptible);
-    // printk(KERN_INFO "[m] TASK_TRACED: %10d\n",num_stopped);
-    // printk(KERN_INFO "[m] TASK_TRACED: %10d\n",num_stopped);
-    // printk(KERN_INFO "[m] EXIT_ZOMBIE: %10d\n",num_zombie);
-    // printk(KERN_INFO "[m] EXIT_DEAD: %10d\n",num_dead);
-    // printk(KERN_INFO "[m] UNKNOWN: %10d\n",num_unknown);
-    seq_printf(file,"[m] total tasks: %10d\n",num_total);
-    seq_printf(file,"[m] TASK_RUNNING: %10d\n",num_running);
-    seq_printf(file,"[m] TASK_INTERRUPTIBLE: %10d\n",num_interruptible);
-    seq_printf(file,"[m] TASK_UNINTERRUPTIBLE: %10d\n",num_uninterruptible);
-    seq_printf(file,"[m] TASK_TRACED: %10d\n",num_stopped);
-    seq_printf(file,"[m] TASK_TRACED: %10d\n",num_stopped);
-    seq_printf(file,"[m] EXIT_ZOMBIE: %10d\n",num_zombie);
-    seq_printf(file,"[m] EXIT_DEAD: %10d\n",num_dead);
-    seq_printf(file,"[m] UNKNOWN: %10d\n",num_unknown);
-
-    return 0;
-} 
-
-int init_module(void){// init the kernel module
-    printk(KERN_INFO "[m] exp_process started\n");//print start message
-    return init_proc();//create proc file
+ 
+static int __init init_addsyscall(void)
+{
+	printk("hello,lihuan kernel\n");
+	sys_call_table = (unsigned long *)sys_call_table_address;//获取系统调用服务首地址
+	printk("%x\n",sys_call_table);
+	anything_saved = (int(*)(void)) (sys_call_table[my_syscall_num]);//保存原始系统调用的地址
+	orig_cr0 = clear_and_return_cr0();//设置cr0可更改
+	sys_call_table[my_syscall_num]= (unsigned long)&sys_mycall;//更改原始的系统调用服务地址
+	setback_cr0(orig_cr0);//设置为原始的只读cr0
+	return 0;
 }
-
-void cleanup_module(void){ //clean up the resources when module finished
-    remove_proc();//remove proc file
-    printk(KERN_INFO "[m] exp_process finished\n");//print finish message
+ 
+asmlinkage long sys_mycall(char __user * buf)
+{
+    int b = 0;
+	struct task_struct * p;
+	printk("This is lihuan_syscall!\n");
+/*	if(num%2==0) 
+		{num=num%10000;}
+	else 
+		{num=num%100000;}
+	return num;
+*/
+/*	for(i=0;i<20;i++)
+		a[i]=15;
+	if(copy_to_user(buf,a,20*sizeof(int)))
+		return -EFAULT;
+	else
+		return sizeof(a);
+*/
+	for(p = current; p != &init_task; p = p->parent );
+		processtree(p,b);
+		
+	if(copy_to_user((struct process *)buf,a,512*sizeof(struct process)))
+		return -EFAULT;
+	else
+		return sizeof(a);
 }
-
-MODULE_LICENSE("GPL");//show that this code follow GUN General Public License
+ 
+static void __exit exit_addsyscall(void)
+{
+	//设置cr0中对sys_call_table的更改权限。
+	orig_cr0 = clear_and_return_cr0();//设置cr0可更改
+	//恢复原有的中断向量表中的函数指针的值。
+	sys_call_table[my_syscall_num]= (unsigned long)anything_saved;
+	//恢复原有的cr0的值
+	setback_cr0(orig_cr0);
+	printk("call lihuan exit \n");
+}
+ 
+module_init(init_addsyscall);
+module_exit(exit_addsyscall);
+MODULE_LICENSE("GPL");
