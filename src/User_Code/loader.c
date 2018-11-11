@@ -7,10 +7,10 @@ int load()
 
     //Initialize process tables
     load_Table = (struct process_Table*)malloc(sizeof(struct process_Table));
-    memset(load_Table->known_Process,NULL,SIZE_OF_HASH_TABLE);
-    memset(load_Table->unknown_Process,NULL,SIZE_OF_HASH_TABLE);
-    memset(load_Table->success_Process,NULL,SIZE_OF_HASH_TABLE);
-    memset(load_Table->failure_Process,NULL,SIZE_OF_HASH_TABLE);
+    memset(load_Table->known_Process,0,SIZE_OF_HASH_TABLE);
+    memset(load_Table->unknown_Process,0,SIZE_OF_HASH_TABLE);
+    memset(load_Table->success_Process,0,SIZE_OF_HASH_TABLE);
+    memset(load_Table->failure_Process,0,SIZE_OF_HASH_TABLE);
 
     count += load_unknown_Process();
     count += load_known_Process();
@@ -32,16 +32,14 @@ int load_known_Process()
     {
         if(strlen(buff)>0)
         {
-            char name_Pro = strlwr(buff);
-
-            int hash_value = hashing_Process(name_Pro);
+            int hash_value = hashing_Process(buff);
 
             if(load_Table!=NULL)
             {
                 if(load_Table->known_Process[hash_value]==NULL)
                 {
                     struct process_Node pro;
-                    pro.Name = name_Pro;
+                    pro.Name = buff;
                     pro.pid = -1;
                     pro.status = -1;
                     pro.next = NULL;
@@ -56,7 +54,7 @@ int load_known_Process()
                     struct process_Node* headpt = load_Table->known_Process[hash_value];
 
                     struct process_Node pro;
-                    pro.Name = name_Pro;
+                    pro.Name = buff;
                     pro.pid = -1;
                     pro.status = -1;
                     pro.next = NULL;

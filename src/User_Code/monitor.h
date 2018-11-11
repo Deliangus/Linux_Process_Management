@@ -6,7 +6,7 @@
 
 #include "loader.h"
 #include "log.h"
-#include "../Kernal_Module/syscall.c"
+//#include "../Kernal_Module/syscall.c"
 #include "../data_type.h"
 
 #define HIJACKED_SYSCALL __NR_tuxcall

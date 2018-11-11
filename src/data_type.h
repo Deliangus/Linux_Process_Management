@@ -1,5 +1,5 @@
 struct process{
 	char * name;
-	int pid;
+	unsigned long pid;
 };
 

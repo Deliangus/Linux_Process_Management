@@ -27,7 +27,7 @@ static unsigned long syscall_getProcess(const struct process* user_List)
 	for_each_process(p)
 	{
 		process_List[counter].pid = p -> pid;
-		process_List[counter].name = p ->com;
+		process_List[counter].name = p ->comm;
 		counter++;
 		if(counter>= 512)
 		{
@@ -38,7 +38,7 @@ static unsigned long syscall_getProcess(const struct process* user_List)
 	process_List[0].pid = counter;
 	process_List[0].name = PROCESS_LIST_HEAD;
 	
-	unsigned long status = copy_to_user(user_List,&process_List,sizeof(struct process)*counter);
+	unsigned long status = copy_to_user((void*)user_List,(void*)&process_List,sizeof(struct process)*counter);
 
 	return status;
 }
