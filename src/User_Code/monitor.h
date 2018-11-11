@@ -1,13 +1,11 @@
 #include <sys/syscall.h>
-
+#include <sys/types.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
 
 #include "loader.h"
 #include "log.h"
-//#include "../Kernal_Module/syscall.c"
-#include "../data_type.h"
 
 #define HIJACKED_SYSCALL __NR_tuxcall
 #define PROCESS_LIST_HEAD "PROCESS_LIST_HEAD"

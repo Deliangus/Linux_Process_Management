@@ -12,14 +12,19 @@ int load()
     memset(load_Table->success_Process,0,SIZE_OF_HASH_TABLE);
     memset(load_Table->failure_Process,0,SIZE_OF_HASH_TABLE);
 
-    count += load_unknown_Process();
+    //count += load_unknown_Process();
     count += load_known_Process();
-    count += load_success_Process();
-    count += load_failure_Process();
+    //count += load_success_Process();
+    //count += load_failure_Process();
 
     //TO DO: output log
     
     return count;
+}
+
+int hashing_Process(char*Name)
+{
+
 }
 
 int load_known_Process()
@@ -75,4 +80,19 @@ int load_known_Process()
     }
 
     //TO DO: log
+}
+
+int load_unknown_Process()
+{
+
+}
+
+int load_success_Process()
+{
+
+}
+
+int load_failure_Process()
+{
+
 }

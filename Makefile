@@ -1,8 +1,27 @@
-all:bin
+ROOT = $(shell pwd)
+BIN = $(ROOT)/bin
+USC = $(ROOT)/src/User_Code
+KNL = $(ROOT)/src/Kernal_Module
 
-bin:
-	@mkdir -p ${dir $@}
-	gcc -o bin/sys2018 src/User_Code/monitor.c src/User_Code/log.c src/User_Code/loader.c -lrt -lpthread
+USR_EXE = $(BIN)/sys2018
+SYSCALL = $(BIN)/syscall.ko
 
-clean:
-	@$(RM) -rf bin
+USC_SRC = $(wildcard $(USC)/*.c)
+USC_OBJ = $(USC_SRC: .c=.o)
+
+CURRENT = $(shell uname -r)
+KDIR	=/lib/modules/$(CURRENT)/build
+
+all: $(USR_EXE) $(SYSCALL)
+
+$(USR_EXE) : $(USC_OBJ)
+	mkdir -p $(BIN)
+	$(CC) -o $@ $^
+
+$(SYSCALL):
+	$(MAKE) -C $(KDIR) M=$(KNL) modules
+	echo "sudo insmod $(KNL)/syscall.ko"
+clean: 
+	$(RM) -rf $(BIN)
+
+.PHONY: clean all
