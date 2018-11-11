@@ -5,20 +5,17 @@
 #include <linux/syscalls.h>
 #include <linux/kallsyms.h>
 
+#include "data_type.h"
+
 #define SYS_CALL_TABLE "sys_call_table"
 #define SYSCALL_NI __NR_tuxcall
 #define PROCESS_LIST_HEAD "PROCESS_LIST_HEAD"
 
-static ulong *syscall_table = NULL;
+static unsigned long *syscall_table = NULL;
 
 static void *original_syscall = NULL;
 
-struct process{
-	char * name;
-	int pid;
-}
-
-struct process[512] process_List;
+static struct process process_List[512];
 
 static unsigned long syscall_getProcess(const struct process* user_List)
 {
@@ -39,21 +36,21 @@ static unsigned long syscall_getProcess(const struct process* user_List)
 	}
 
 	process_List[0].pid = counter;
-	process_list[0].name = PROCESS_LIST_HEAD;
+	process_List[0].name = PROCESS_LIST_HEAD;
 	
-	ulong status = copy_to_user(user_list,&process_List,sizeof(struct process)*counter);
+	unsigned long status = copy_to_user(user_List,&process_List,sizeof(struct process)*counter);
 
 	return status;
 }
 
-static int is_syscall_table(ulong *p)
+static int is_syscall_table(unsigned long *p)
 {
-        return ((p != NULL) && (p[__NR_close] == (ulong)sys_close));
+        return ((p != NULL) && (p[__NR_close] == (unsigned long)sys_close));
 }
 
-static int page_read_write(ulong address)
+static int page_read_write(unsigned long address)
 {
-        uint level;
+        unsigned int level;
         pte_t *pte = lookup_address(address, &level);
 
         if(pte->pte &~ _PAGE_RW)
@@ -61,42 +58,42 @@ static int page_read_write(ulong address)
         return 0;
 }
 
-static int page_read_only(ulong address)
+static int page_read_only(unsigned long address)
 {
-        uint level;
+        unsigned int level;
         pte_t *pte = lookup_address(address, &level);
         pte->pte = pte->pte &~ _PAGE_RW;
         return 0;
 }
 
-static void install_syscall(ulong repalce_Index,ulong replace_funcion)
+static void install_syscall(unsigned long repalce_Index,unsigned long replace_funcion)
 {
-	syscall_table = (ulong*)kallsyms_lookup_name(SYS_CALL_TABLE);
+	syscall_table = (unsigned long*)kallsyms_lookup_name(SYS_CALL_TABLE);
 
 	if(is_syscall_table(syscall_table))
 	{
-		page_read_write((ulong)syscall_table);
+		page_read_write((unsigned long)syscall_table);
 
         original_syscall = (void *)(syscall_table[repalce_Index]);
 
 		syscall_table[repalce_Index] = replace_funcion;
 
-		page_read_only((ulong)syscall_table);
+		page_read_only((unsigned long)syscall_table);
 	}
 }
 
 static int init_syscall(void)
 {
-        install_syscall(SYSCALL_NI, (ulong)syscall_getProcess);
+        install_syscall(SYSCALL_NI, (unsigned long)syscall_getProcess);
 		printk(KERN_INFO "Custom syscall loaded\n");
         return 0;
 }
 
 static void cleanup_syscall(void)
 {
-        page_read_write((ulong)syscall_table);
-        syscall_table[SYSCALL_NI] = (ulong)original_syscall;
-        page_read_only((ulong)syscall_table);
+        page_read_write((unsigned long)syscall_table);
+        syscall_table[SYSCALL_NI] = (unsigned long)original_syscall;
+        page_read_only((unsigned long)syscall_table);
         printk(KERN_INFO "Syscall at offset %d : %p\n", SYSCALL_NI, (void *)syscall_table[SYSCALL_NI]);
         printk(KERN_INFO "Custom syscall unloaded\n");
 }
