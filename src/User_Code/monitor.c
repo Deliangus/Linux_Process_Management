@@ -30,7 +30,29 @@ static void print_Process_List(unsigned long length)
     return;
 }
 
-static int kill_Process(unsigned long pid)
+static int kill_Process(unsigned long pid,char * name)
 {
-    
+    if(kill(pid)==0)
+    {
+        printf("Process\t%xl\t%s has been killed\n",pid,name);
+
+    }
+    else
+    {
+        print("Failed: kill process\t%xl\t%s\n.",pid,name);
+    }
+}
+
+int main(int args, char **argv)
+{
+    pid_t pid = fork();
+
+    if(pid == 0)
+    {
+        execve("I")
+    }
+    else
+    {
+
+    }
 }

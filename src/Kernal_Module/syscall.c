@@ -5,7 +5,7 @@
 #include <linux/syscalls.h>
 #include <linux/kallsyms.h>
 
-#include "data_type.h"
+#include "../data_type.h"
 
 #define SYS_CALL_TABLE "sys_call_table"
 #define SYSCALL_NI __NR_tuxcall

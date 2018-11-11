@@ -6,8 +6,8 @@
 
 #include "loader.h"
 #include "log.h"
-#include "syscall.c"
-#include "data_type.h"
+#include "../Kernal_Module/syscall.c"
+#include "../data_type.h"
 
 #define HIJACKED_SYSCALL __NR_tuxcall
 #define PROCESS_LIST_HEAD "PROCESS_LIST_HEAD"
@@ -15,7 +15,7 @@
 
 static struct process process_List[512];
 
-static int kill_Process(unsigned long pid);
+static int kill_Process(unsigned long pid,char * name);
 
 static unsigned long syscall_get_Process_Info();
 
