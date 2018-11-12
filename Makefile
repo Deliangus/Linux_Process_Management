@@ -20,12 +20,12 @@ $(USR_EXE) : $(USC_OBJ)
 
 $(SYSCALL):
 	$(MAKE) -C $(KDIR) M=$(KNL) modules
-	insmod $(KNL)/syscall.ko
-	echo "sudo insmod $(KNL)/syscall.ko"
+#	insmod $(KNL)/syscall.ko
+#	echo "sudo insmod $(KNL)/syscall.ko"
 
 clean: 
-	rmmod $(KNL)/syscall.ko
-	echo "rmmod $(KNL)/syscall.ko"
+#	rmmod $(KNL)/syscall.ko
+#	echo "rmmod $(KNL)/syscall.ko"
 	$(RM) -rf $(BIN)
 	$(MAKE) -C $(KDIR) M=$(KNL) clean
 

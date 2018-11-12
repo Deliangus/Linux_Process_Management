@@ -3,6 +3,8 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <sys/wait.h>
+#include <ctype.h>
 
 #include "loader.h"
 #include "log.h"

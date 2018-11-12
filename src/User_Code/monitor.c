@@ -32,7 +32,13 @@ static void print_Process_List(unsigned long length)
 
 static int kill_Process(unsigned long pid,char * name)
 {
-    if(kill(pid)==0)
+    char instruction [50] = "kill ";
+
+    sprintf(instruction, "%s %ld","kill", pid);
+
+    int shell = system(instruction);
+
+    if(shell==0)
     {
         printf("Process\t%lu\t%s has been killed\n",pid,name);
 
@@ -45,14 +51,41 @@ static int kill_Process(unsigned long pid,char * name)
 
 int main(int args, char **argv)
 {
-    pid_t pid = fork();
 
-    if(pid == 0)
+    int status;
+
+    status = system("sudo insmod ../src/Kernal_Module/syscall.ko");
+
+    if(WIFEXITED(status)&&(0 == WEXITSTATUS(status)))
     {
-        //execve("I");
+        printf("System call module has been loaded\n");
     }
     else
     {
-
+        printf("Failed to load system call module\n");
+        exit(-1);
     }
+
+    unsigned long num_Process = 0;
+
+    num_Process = syscall_get_Process_Info();
+
+    print_Process_List(num_Process);
+
+    status = system("sudo rmmod ../src/Kernal_Module/syscall.ko");
+    
+    if(WIFEXITED(status)&&(0 == WEXITSTATUS(status)))
+    {
+        printf("System call module has been unloaded\n");
+    }
+    else
+    {
+        printf("Failed to unload system call module.\n");
+        exit(-1);
+    }
+
+
+    printf("Winner Winner, Chicken Chicken.\n");
+
+    exit(0);
 }
