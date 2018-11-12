@@ -5,18 +5,18 @@
 #include <stdio.h>
 #include <sys/wait.h>
 #include <ctype.h>
+#include <linux/limits.h>
 
 #include "loader.h"
 #include "log.h"
 
 #define HIJACKED_SYSCALL __NR_tuxcall
 #define PROCESS_LIST_HEAD "PROCESS_LIST_HEAD"
-#define ulong unsigned long
 
-static struct process process_List[512];
+struct process process_List[512];
 
-static int kill_Process(unsigned long pid,char * name);
+static int kill_Process(pid_t pid,char * name);
 
 static unsigned long syscall_get_Process_Info();
 
-static void print_Process_List(unsigned long length);
+static void print_Process_List(pid_t length);

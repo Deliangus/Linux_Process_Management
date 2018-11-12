@@ -5,8 +5,8 @@
 #define PATH_TO_FAILURE_PROCESS "../classification/known_Process"
 
 struct process{
-	char * name;
-	unsigned long pid;
+	char name[20];
+	pid_t pid;
 };
 
 struct process_Node
