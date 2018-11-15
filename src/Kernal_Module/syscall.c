@@ -81,7 +81,7 @@ static void install_syscall(unsigned long repalce_Index,unsigned long replace_fu
 	{
 		page_read_write((unsigned long)syscall_table);
 
-        original_syscall = (void *)(syscall_table[repalce_Index]);
+        	original_syscall = (void *)(syscall_table[repalce_Index]);
 
 		syscall_table[repalce_Index] = replace_funcion;
 
