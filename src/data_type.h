@@ -4,6 +4,8 @@
 #define PATH_TO_SUCCESS_PROCESS "../classification/known_Process"
 #define PATH_TO_FAILURE_PROCESS "../classification/known_Process"
 
+char path_Root[150];
+
 struct process{
 	char name[20];
 	pid_t pid;

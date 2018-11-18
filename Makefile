@@ -2,6 +2,7 @@ ROOT = $(shell pwd)
 BIN = $(ROOT)/bin
 USC = $(ROOT)/src/User_Code
 KNL = $(ROOT)/src/Kernal_Module
+LOG = $(ROOT)/log
 
 USR_EXE = $(BIN)/sys2018
 SYSCALL = $(BIN)/syscall.ko
@@ -12,7 +13,7 @@ USC_OBJ = $(USC_SRC: .c=.o)
 CURRENT = $(shell uname -r)
 KDIR	=/lib/modules/$(CURRENT)/build
 
-all: $(USR_EXE) $(SYSCALL)
+all: $(USR_EXE) $(SYSCALL) $(LOG)
 
 $(USR_EXE) : $(USC_OBJ)
 	mkdir -p $(BIN)
@@ -21,8 +22,12 @@ $(USR_EXE) : $(USC_OBJ)
 $(SYSCALL):
 	$(MAKE) -C $(KDIR) M=$(KNL) modules
 
+$(LOG):
+	mkdir -p $(LOG)
+
 clean: 
 	$(RM) -rf $(BIN)
+	$(RM) -rf $(LOG)
 	$(MAKE) -C $(KDIR) M=$(KNL) clean
 
 

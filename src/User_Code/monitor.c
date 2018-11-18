@@ -37,6 +37,7 @@ static void print_Process_List(pid_t length)
 
 static int kill_Process(pid_t pid,char * name)
 {
+
     char instruction [50] = "kill ";
 
     sprintf(instruction, "%s %d","kill", pid);
@@ -56,8 +57,13 @@ static int kill_Process(pid_t pid,char * name)
 
 int main(int args, char **argv)
 {
-
+    //Veriable used to receive shell command result
+    // 0 when shell command executed correctly
     int status;
+
+    //Get the path of program folder
+    //../Linux_Process_Managing_Module
+    getcwd(path_Root,sizeof(path_Root));
 
     status = system("sudo insmod src/Kernal_Module/syscall.ko");
 
@@ -71,10 +77,20 @@ int main(int args, char **argv)
         exit(-1);
     }
 
-    unsigned long num_Process = 0;
+    if(syscall_Get_Process_Info()==0)
+    {
+        process_List_Print(process_List[0].pid);
 
-    num_Process = syscall_get_Process_Info();
+        printf("Winner Winner, Chicken Dinner.\n");
 
+        exit(0);
+    }
+    else
+    {
+        printf("Failed to get process list.\n");
+    }
+
+    //Remove Kernal Module
     status = system("sudo rmmod src/Kernal_Module/syscall.ko");
 
     if(WIFEXITED(status)&&(0 == WEXITSTATUS(status)))
@@ -85,18 +101,5 @@ int main(int args, char **argv)
     {
         printf("Failed to unload system call module.\n");
         exit(-1);
-    }
-
-    if(num_Process==0)
-    {
-        print_Process_List(process_List[0].pid);
-
-        printf("Winner Winner, Chicken Dinner.\n");
-
-        exit(0);
-    }
-    else
-    {
-        printf("Failed to get process list.\n");
     }
 }

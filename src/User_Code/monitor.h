@@ -15,8 +15,10 @@
 
 struct process process_List[512];
 
-static int kill_Process(pid_t pid,char * name);
+static int process_Kill(pid_t pid,char * name);
 
-static unsigned long syscall_get_Process_Info();
+static unsigned long syscall_Get_Process_Info();
 
-static void print_Process_List(pid_t length);
+static void process_List_Print(pid_t length);
+
+static int 
