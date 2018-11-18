@@ -21,4 +21,4 @@ static unsigned long syscall_Get_Process_Info();
 
 static void process_List_Print(pid_t length);
 
-static int 
+static void kernel_Module_Load();

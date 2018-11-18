@@ -55,15 +55,11 @@ static int kill_Process(pid_t pid,char * name)
     }
 }
 
-int main(int args, char **argv)
+static void kernel_Module_Load()
 {
     //Veriable used to receive shell command result
     // 0 when shell command executed correctly
     int status;
-
-    //Get the path of program folder
-    //../Linux_Process_Managing_Module
-    getcwd(path_Root,sizeof(path_Root));
 
     status = system("sudo insmod src/Kernal_Module/syscall.ko");
 
@@ -76,6 +72,18 @@ int main(int args, char **argv)
         printf("Failed to load system call module\n");
         exit(-1);
     }
+
+    return status;
+}
+
+int main(int args, char **argv)
+{
+    
+    //Get the path of program folder
+    //../Linux_Process_Managing_Module
+    getcwd(path_Root,sizeof(path_Root));
+
+    kernel_Module_Load();
 
     if(syscall_Get_Process_Info()==0)
     {
