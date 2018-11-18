@@ -17,8 +17,10 @@ struct process process_List[512];
 
 static int process_Kill(pid_t pid,char * name);
 
-static unsigned long syscall_Get_Process_Info();
+static void syscall_Get_Process_Info();
 
 static void process_List_Print(pid_t length);
 
 static void kernel_Module_Load();
+
+static void kernel_Module_Remove();

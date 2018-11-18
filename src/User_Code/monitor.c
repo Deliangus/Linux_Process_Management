@@ -1,7 +1,7 @@
 #include "monitor.h"
 
 
-static unsigned long syscall_get_Process_Info(void)
+static void syscall_get_Process_Info(void)
 {
     printf("..........Getting list of processes\n");
 
@@ -10,6 +10,7 @@ static unsigned long syscall_get_Process_Info(void)
     printf("List Length before:%u\n",process_List[0].pid);
 
     unsigned long process_count = syscall(HIJACKED_SYSCALL,process_List);
+
     if(process_count!=0)
     {
         printf("..........Failed to get list of prcesses\t%lu\n",process_count);
@@ -17,9 +18,8 @@ static unsigned long syscall_get_Process_Info(void)
     else
     {
         printf("..........Successed to get list of prcesses\t%lu\n",process_count);
+        exit(-2);
     }
-
-    return process_count;
 }
 
 static void print_Process_List(pid_t length)
@@ -38,7 +38,7 @@ static void print_Process_List(pid_t length)
 static int kill_Process(pid_t pid,char * name)
 {
 
-    char instruction [50] = "kill ";
+    char instruction [50];
 
     sprintf(instruction, "%s %d","kill", pid);
 
@@ -76,27 +76,11 @@ static void kernel_Module_Load()
     return status;
 }
 
-int main(int args, char **argv)
+static void kernel_Module_Remove()
 {
-    
-    //Get the path of program folder
-    //../Linux_Process_Managing_Module
-    getcwd(path_Root,sizeof(path_Root));
-
-    kernel_Module_Load();
-
-    if(syscall_Get_Process_Info()==0)
-    {
-        process_List_Print(process_List[0].pid);
-
-        printf("Winner Winner, Chicken Dinner.\n");
-
-        exit(0);
-    }
-    else
-    {
-        printf("Failed to get process list.\n");
-    }
+    //Veriable used to receive shell command result
+    // 0 when shell command executed correctly
+    int status;
 
     //Remove Kernal Module
     status = system("sudo rmmod src/Kernal_Module/syscall.ko");
@@ -108,6 +92,21 @@ int main(int args, char **argv)
     else
     {
         printf("Failed to unload system call module.\n");
-        exit(-1);
+        exit(-3);
     }
+
+}
+int main(int args, char **argv)
+{
+    //Get the path of program folder
+    //../Linux_Process_Managing_Module
+    getcwd(path_Root,sizeof(path_Root));
+
+    kernel_Module_Load();
+
+    syscall_get_Process_Info();
+
+    kernel_Module_Remove();
+
+    return 0;
 }
