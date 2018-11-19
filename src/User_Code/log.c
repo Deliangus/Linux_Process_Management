@@ -1,6 +1,6 @@
 #include "log.h"
 
-int log_Output_Initialize()
+void log_Output_Initialize()
 {
     char log_Path[200];
 
@@ -14,5 +14,25 @@ int log_Output_Initialize()
 
     log_Output = fopen(log_Path,"-w");
 
-    //TO DO
+    if(log_Output==NULL)
+    {
+        log_Print_To_Terminal("Failed to open log file\n");
+        exit(-4);
+    }
+    else
+    {
+        log_Print("Log initialized.\n");
+        
+    }
+}
+
+void log_Print_To_Terminal(char*string)
+{
+    printf("%s\n",string);
+}
+
+void log_Print(char *string)
+{
+    printf("%s\n",string);
+    fprintf(log_Output,"%s\n",string);
 }

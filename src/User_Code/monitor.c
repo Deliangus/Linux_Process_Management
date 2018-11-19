@@ -102,6 +102,8 @@ int main(int args, char **argv)
     //../Linux_Process_Managing_Module
     getcwd(path_Root,sizeof(path_Root));
 
+    log_Output_Initialize();
+
     kernel_Module_Load();
 
     syscall_get_Process_Info();
