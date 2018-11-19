@@ -79,7 +79,7 @@ static void kernel_Module_Remove()
 int main(int args, char **argv)
 {
     //Get the path of program folder
-    //../Linux_Process_Managing_Module
+    //../Linux_Process_Management
     getcwd(path_Root,sizeof(path_Root));
 
     log_Output_Initialize(path_Root);
