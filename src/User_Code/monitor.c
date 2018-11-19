@@ -1,13 +1,13 @@
 #include "monitor.h"
-
+#include "loader.h"
+#include "log.h"
 
 static void syscall_get_Process_Info(void)
 {
-    printf("..........Getting list of processes\n");
+    log_Print("..........Getting list of processes\n");
 
     memset(&process_List,0,sizeof(struct process)*512);
 
-    printf("List Length before:%u\n",process_List[0].pid);
 
     unsigned long process_count = syscall(HIJACKED_SYSCALL,process_List);
 
@@ -33,26 +33,6 @@ static void print_Process_List(pid_t length)
     }
     
     return;
-}
-
-static int kill_Process(pid_t pid,char * name)
-{
-
-    char instruction [50];
-
-    sprintf(instruction, "%s %d","kill", pid);
-
-    int shell = system(instruction);
-
-    if(shell==0)
-    {
-        printf("Process\t%u\t%s has been killed\n",pid,name);
-
-    }
-    else
-    {
-        printf("Failed: kill process\t%u\t%s\n.",pid,name);
-    }
 }
 
 static void kernel_Module_Load()
@@ -102,7 +82,9 @@ int main(int args, char **argv)
     //../Linux_Process_Managing_Module
     getcwd(path_Root,sizeof(path_Root));
 
-    log_Output_Initialize();
+    log_Output_Initialize(path_Root);
+
+    load();
 
     kernel_Module_Load();
 

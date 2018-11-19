@@ -2,12 +2,9 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include "loader.h"
+FILE* log_Output;
 
-FILE* log_Output = NULL;
-
-
-void log_Output_Initialize();
+void log_Output_Initialize(char *);
 
 void log_Print_To_Terminal(char *string);
 

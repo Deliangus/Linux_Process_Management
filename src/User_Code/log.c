@@ -1,7 +1,9 @@
 #include "log.h"
 
-void log_Output_Initialize()
+void log_Output_Initialize(char*path_Root)
 {
+    log_Output = NULL;
+
     char log_Path[200];
 
     time_t rawtime;
