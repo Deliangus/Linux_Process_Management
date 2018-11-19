@@ -21,3 +21,15 @@ int kill_Process(char * name)
         printf("Failed: kill process\t%u\t%s\n.",pid,name);
     }
 }
+
+//Kill all prcess in process_Kill List
+int apply_Process_Kill()
+{
+    //TO DO
+}
+
+//Eliminate all prcess in process_Eliminate List
+int apply_Process_Eliminate()
+{
+    //TO DO
+}

@@ -11,3 +11,6 @@ int kill_Process(char * name);
 
 int apply_Process_Kill();
 
+int apply_Process_Eliminate();
+
+int update_Process_Unknown();
