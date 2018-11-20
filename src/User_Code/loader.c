@@ -1,4 +1,5 @@
 #include "loader.h"
+#include "log.h"
 
 void load()
 {
@@ -11,18 +12,16 @@ void load()
     memset(process_Eliminate,0,SIZE_OF_HASH_TABLE);
 
     load_List(PATH_TO_PROCESS_WHITE_LIST,process_White_List);
-    log_print("White list is loaded\n");
+    log_Print("White list is loaded\n");
 
     load_List(PATH_TO_PROCESS_UNKNOWN,process_Unknown);
-    log_print("Unknown list is loaded\n");
+    log_Print("Unknown list is loaded\n");
 
-    load_list(PATH_TO_PROCESS_KILL,process_Kill);
-    log_print("Kill list is loaded\n");
+    load_List(PATH_TO_PROCESS_KILL,process_Kill);
+    log_Print("Kill list is loaded\n");
 
-    load_list(PATH_TO_PROCESS_ELIMINATE,process_Eliminate);
-    log_print("Eliminate list is loaded\n");
-    
-    return count;
+    load_List(PATH_TO_PROCESS_ELIMINATE,process_Eliminate);
+    log_Print("Eliminate list is loaded\n");
 }
 
 //Return a hash value according to given process name
@@ -75,7 +74,7 @@ int load_List(char*path,struct process_Node* destination[SIZE_OF_HASH_TABLE])
             }
             else
             {
-                log_print("Failed to load list [Name of 0 length readed]");
+                log_Print("Failed to load list [Name of 0 length readed]");
                 exit(-1);
             }
         }
@@ -83,10 +82,16 @@ int load_List(char*path,struct process_Node* destination[SIZE_OF_HASH_TABLE])
 
 }
 
+//Get process_Node from the four hast tables
+struct process_Node* get_Process(char *name)
+{
+    //TO DO
+}
+
 //Get pid of process according to its name from the four process_Node* List
 pid_t get_Process_Pid(char* name)
 {
-    //TO Do
+    //TO DO
 }
 
 //Get action to do with process given its name

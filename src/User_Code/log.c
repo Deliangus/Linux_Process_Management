@@ -12,7 +12,7 @@ void log_Output_Initialize(char*path_Root)
 
     struct tm *timeinfo = localtime(&rawtime);
 
-    sprintf(log_Path,"%s %s_%d_%d_%d_%d_%s",path_Root,"\\log\\log",timeinfo->tm_mon,timeinfo->tm_mday,timeinfo->tm_hour,timeinfo->tm_min,timeinfo->tm_sec);
+    sprintf(log_Path,"%s %s_%d_%d_%d_%d_%d",path_Root,"\\log\\log",timeinfo->tm_mon,timeinfo->tm_mday,timeinfo->tm_hour,timeinfo->tm_min,timeinfo->tm_sec);
 
     log_Output = fopen(log_Path,"-w");
 

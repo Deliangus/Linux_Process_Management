@@ -1,4 +1,5 @@
 #include "policy.h"
+#include "loader.h"
 
 int kill_Process(char * name)
 {

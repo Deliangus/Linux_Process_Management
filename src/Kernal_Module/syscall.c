@@ -4,8 +4,9 @@
 #include <linux/unistd.h>
 #include <linux/syscalls.h>
 #include <linux/kallsyms.h>
+#include <asm/unistd.h>
 
-#include "../data_type.h"
+#include "../User_Code/monitor.h"
 
 #define SYS_CALL_TABLE "sys_call_table"
 #define SYSCALL_NI __NR_tuxcall

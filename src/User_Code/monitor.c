@@ -45,15 +45,13 @@ static void kernel_Module_Load()
 
     if(WIFEXITED(status)&&(0 == WEXITSTATUS(status)))
     {
-        printf("System call module has been loaded\n");
+        log_Print("System call module has been loaded\n");
     }
     else
     {
-        printf("Failed to load system call module\n");
+        log_Print("Failed to load system call module\n");
         exit(-1);
     }
-
-    return status;
 }
 
 static void kernel_Module_Remove()
