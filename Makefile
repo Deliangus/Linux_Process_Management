@@ -11,13 +11,13 @@ USC_SRC = $(wildcard $(USC)/*.c)
 USC_OBJ = $(USC_SRC: .c=.o)
 
 CURRENT = $(shell uname -r)
-KDIR	=/lib/modules/$(CURRENT)/build
+KDIR	= /lib/modules/$(CURRENT)/build
 
 all: $(USR_EXE) $(SYSCALL) $(LOG)
 
 $(USR_EXE) : $(USC_OBJ)
 	mkdir -p $(BIN)
-	$(CC) -o $@ $^
+	$(CC) $^ -o $@ $(LDFLAGS)
 
 $(SYSCALL):
 	$(MAKE) -C $(KDIR) M=$(KNL) modules
@@ -25,10 +25,9 @@ $(SYSCALL):
 $(LOG):
 	mkdir -p $(LOG)
 
-clean: 
+clean:
 	$(RM) -rf $(BIN)
 	$(RM) -rf $(LOG)
 	$(MAKE) -C $(KDIR) M=$(KNL) clean
-
 
 .PHONY: clean all
