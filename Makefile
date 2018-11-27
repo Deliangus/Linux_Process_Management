@@ -1,14 +1,14 @@
 ROOT = $(shell pwd)
 BIN = $(ROOT)/bin
 USC = $(ROOT)/src/User_Code
-KNL = $(ROOT)/src/Kernal_Module
+KNL = $(ROOT)/src/Kernel_Module
 LOG = $(ROOT)/log
 
 USR_EXE = $(BIN)/sys2018
-SYSCALL = $(BIN)/syscall.ko
+SYSCALL = $(KNL)/system_call.ko
 
 USC_SRC = $(wildcard $(USC)/*.c)
-USC_OBJ = $(USC_SRC: .c=.o)
+USC_OBJ = $(USC_SRC:.c=.o)
 
 CURRENT = $(shell uname -r)
 KDIR	= /lib/modules/$(CURRENT)/build

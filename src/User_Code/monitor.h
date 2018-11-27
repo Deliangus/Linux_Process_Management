@@ -1,4 +1,4 @@
-#include <sys/wait.h>
+//#include <sys/wait.h>
 #include <sys/syscall.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -6,15 +6,10 @@
 #include <ctype.h>
 #include <linux/limits.h>
 
+#include "../Kernel_Module/system_call.h"
 
 #define HIJACKED_SYSCALL __NR_tuxcall
 #define PROCESS_LIST_HEAD "PROCESS_LIST_HEAD"
-#define LENGTH_PROCESS_NAME 30
-
-struct process{
-	char name[LENGTH_PROCESS_NAME];
-	pid_t pid;
-};
 
 struct process process_List[512];
 

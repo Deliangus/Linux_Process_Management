@@ -8,7 +8,7 @@
 ## Last update Fri Apr 18 22:13:46 2014 xsyann
 ##
 
-TARGET	= syscall
+TARGET	= system_call
 
 obj-m	+= $(TARGET).o
 

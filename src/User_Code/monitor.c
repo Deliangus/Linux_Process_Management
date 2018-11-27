@@ -41,7 +41,10 @@ static void kernel_Module_Load()
     // 0 when shell command executed correctly
     int status;
 
-    status = system("sudo insmod src/Kernal_Module/syscall.ko");
+    char command[100];
+    sprintf(command,"%s%s%s","sudo insmod src/Kernal_Module/",Kernel_Name_String,".ko");
+
+    status = system(command);
 
     if(WIFEXITED(status)&&(0 == WEXITSTATUS(status)))
     {
@@ -60,8 +63,11 @@ static void kernel_Module_Remove()
     // 0 when shell command executed correctly
     int status;
 
+    char command[100];
+    sprintf(command,"%s%s%s","sudo rmmod src/Kernal_Module/",Kernel_Name_String,".ko");
+
     //Remove Kernal Module
-    status = system("sudo rmmod src/Kernal_Module/syscall.ko");
+    status = system(command);
 
     if(WIFEXITED(status)&&(0 == WEXITSTATUS(status)))
     {

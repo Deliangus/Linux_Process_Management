@@ -3,7 +3,8 @@
 
 .classpath
 .project
-.settings     
+.settings
+.vscode     
  ##filter databfile��sln file##
 *.mdb  
 *.ldb  
