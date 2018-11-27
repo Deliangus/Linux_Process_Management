@@ -1,3 +1,11 @@
+#include <linux/init.h>
+#include <linux/module.h>
+#include <linux/kernel.h>
+#include <linux/unistd.h>
+#include <linux/syscalls.h>
+#include <linux/kallsyms.h>
+#include <asm/unistd.h>
+
 #include "system_call.h"
 
 static unsigned long *syscall_table = NULL;

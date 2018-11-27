@@ -28,6 +28,7 @@ $(LOG):
 clean:
 	$(RM) -rf $(BIN)
 	$(RM) -rf $(LOG)
+	$(RM) $(USC_OBJ)
 	$(MAKE) -C $(KDIR) M=$(KNL) clean
 
 .PHONY: clean all
