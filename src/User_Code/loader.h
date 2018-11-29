@@ -48,3 +48,5 @@ struct process_Node* get_Process(char *name);
 pid_t get_Process_Pid(char *name);
 
 union process_Type get_Process_Type(char *name);
+
+void table_Update_Pid(pid_t);

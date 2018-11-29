@@ -1,9 +1,13 @@
 #include "loader.h"
 #include "log.h"
+#include "monitor.h"
 
 void load()
 {
+
     int count = 0;
+
+    log_Print("Loading process policies.\n");
 
     //Initialize process tables
     memset(process_White_List,0,SIZE_OF_HASH_TABLE);
@@ -22,6 +26,8 @@ void load()
 
     load_List(PATH_TO_PROCESS_ELIMINATE,process_Eliminate);
     log_Print("Eliminate list is loaded\n");
+
+    log_Print("Process policies loaded.\n");
 }
 
 //Return a hash value according to given process name
@@ -98,4 +104,16 @@ pid_t get_Process_Pid(char* name)
 union process_Type get_Process_Type(char *name)
 {
     //TO DO
+}
+
+void table_Update_Pid(pid_t length)
+{
+    struct process_Node* temp;
+
+    for(int i = 1;i<=length;i++)
+    {
+        temp = get_Process(process_List[i].name);
+
+        temp->pid = process_List[i].pid;
+    }
 }

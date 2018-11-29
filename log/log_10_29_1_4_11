@@ -1,0 +1,9 @@
+Log initialized.
+Loading Kernel Module
+System call module has been loaded
+Getting list of processes
+Successed to get list of prcesses
+Removing Kernel Module
+System call module has been unloaded
+Printing process list to file.
+Process list printed to file.
