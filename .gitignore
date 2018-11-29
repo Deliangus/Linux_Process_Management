@@ -5,7 +5,7 @@
 .project
 .settings
 .vscode     
- ##filter databfile��sln file##
+ ##filter databfile sln file##
 *.mdb  
 *.ldb  
 *.sln   

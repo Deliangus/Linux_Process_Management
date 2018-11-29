@@ -111,6 +111,10 @@ void initialize_variables()
     getcwd(PATH_ROOT,sizeof(PATH_ROOT));
 
     sprintf(PATH_KRN,"%s%s%s","src/Kernel_Module/",Kernel_Name_String,".ko");
+    sprintf(PATH_TO_PROCESS_WHITE_LIST,"%s/%s",PATH_ROOT,"classification/process_White_List");
+    sprintf(PATH_TO_PROCESS_UNKNOWN,"%s/%s",PATH_ROOT,"classification/process_Unknown");
+    sprintf(PATH_TO_PROCESS_KILL,"%s/%s",PATH_ROOT,"classification/process_Kill");
+    sprintf(PATH_TO_PROCESS_ELIMINATE,"%s/%s",PATH_ROOT,"classification/process_Eliminate");
 }
 
 int main(int args, char **argv)
@@ -119,7 +123,7 @@ int main(int args, char **argv)
 
     log_Output_Initialize(path_Root);
 
-    //load();
+    load();
 
     kernel_Module_Load();
 
@@ -128,6 +132,8 @@ int main(int args, char **argv)
     kernel_Module_Remove();
 
     table_Update_Pid(process_List[0].pid);
+
+    print_Four_List();
 
     char ppp[200];
 
