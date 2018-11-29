@@ -201,9 +201,9 @@ void apply_Process_Defined()
     if(fp!=NULL)
     {
         char buff[LENGTH_PROCESS_NAME];
-        int define_Type;
+        char define_Type;
     
-        while(EOF!=fscanf(fp, "%s %c", buff,define_Type))
+        while(EOF!=fscanf(fp, "%s %c", buff,&define_Type))
         {
             if(strlen(buff)>0)
             {

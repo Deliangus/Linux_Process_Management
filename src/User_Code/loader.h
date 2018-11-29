@@ -19,7 +19,7 @@
 #define TYPE_MARK_POSITION type_Mark_Postion
 #define LENGTH_PROCESS_NAME 50
 
-int type_Mark_Postion = 0;
+int type_Mark_Postion;
 
 char path_Table_White_List[200];
 char path_Table_Unknown[200];

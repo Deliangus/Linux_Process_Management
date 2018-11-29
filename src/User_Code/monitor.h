@@ -1,4 +1,3 @@
-//#include <sys/wait.h>
 #include <sys/syscall.h>
 #include <unistd.h>
 #include <stdlib.h>

@@ -1,5 +1,6 @@
 #include "policy.h"
 #include "loader.h"
+#include "log.h"
 
 void kill_Process(char * name)
 {
@@ -93,12 +94,12 @@ void execute_Kill(pid_t pid)
 
     if(shell==0)
     {
-        log_printf("Process\t%u\t%s has been killed\n",pid);
+        //log_Print("Process\t%u\t%s has been killed\n",pid);
 
     }
     else
     {
-        log_printf("Failed: kill process\t%u\t%s\n.",pid);
+        //log_Print("Failed: kill process\t%u\t%s\n.",pid);
     }
 }
 
