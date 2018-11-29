@@ -115,6 +115,9 @@ void initialize_variables()
     sprintf(PATH_TO_PROCESS_UNKNOWN,"%s/%s",PATH_ROOT,"classification/process_Unknown");
     sprintf(PATH_TO_PROCESS_KILL,"%s/%s",PATH_ROOT,"classification/process_Kill");
     sprintf(PATH_TO_PROCESS_ELIMINATE,"%s/%s",PATH_ROOT,"classification/process_Eliminate");
+    sprintf(path_Table_Defined,"%s/%s",PATH_ROOT,"classification/process_Defined");
+
+    TYPE_MARK_POSITION = strlen(PATH_ROOT)+strlen("/classification/process_");
 }
 
 int main(int args, char **argv)
