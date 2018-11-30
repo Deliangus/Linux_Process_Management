@@ -43,12 +43,14 @@ int hashing_Process(char*Name)
     //Default solution:
 
     int i = 0;
-    int result = 0;
+    int result = 1;
     for(i = 0;i<strlen(Name);i++)
     {
         result *= (int)Name[i];
+        result ++;
+        result%=SIZE_OF_HASH_TABLE;
     }
-    return result%SIZE_OF_HASH_TABLE;
+    return result;
 }
 
 int load_List(char*path,struct process_Node* destination[SIZE_OF_HASH_TABLE])
@@ -89,22 +91,34 @@ int load_List(char*path,struct process_Node* destination[SIZE_OF_HASH_TABLE])
 //Get process_Node from the four hash tables
 struct process_Node* get_Process(char *name)
 {
-    log_Print("Getting process.");
+    log_Print("Getting process:\t");
     log_Print(name);
     log_Print("\n");
 
     int hash_value = hashing_Process(name);
 
-    struct process_Node* temp;
+    log_Print(name);
+    printf("\t%d\n",hash_value);
+    
     struct process_Node* result;
 
     result = NULL;
 
     if(process_White_List[hash_value]!=NULL)
     {
-        temp = process_White_List[hash_value];
+        struct process_Node* temp = process_White_List[hash_value];
+        struct process_Node* headpt = process_White_List[hash_value];
 
-        while(temp!=NULL)
+        if(strcmp(name,temp->name)==0)
+        {
+            result = temp;
+        }
+        else
+        {
+            temp = temp->next;
+        }
+
+        while(temp!=headpt)
         {
             if(strcmp(name,temp->name)==0)
             {
@@ -116,12 +130,28 @@ struct process_Node* get_Process(char *name)
                 temp = temp->next;
             }
         }
-    }
-    else if(process_Unknown[hash_value]!=NULL)
-    {
-        temp = process_Unknown[hash_value];
 
-        while(temp!=NULL)
+        if(result == NULL)
+            log_Print("No found in White list.\n");
+        else
+            log_Print("Got process in White list.\n");
+    }
+
+    if(process_Unknown[hash_value]!=NULL)
+    {
+        struct process_Node* temp = process_Unknown[hash_value];
+        struct process_Node* headpt = process_Unknown[hash_value];
+
+        if(strcmp(name,temp->name)==0)
+        {
+            result = temp;
+        }
+        else
+        {
+            temp = temp->next;
+        }
+
+        while(temp!=headpt)
         {
             if(strcmp(name,temp->name)==0)
             {
@@ -133,12 +163,28 @@ struct process_Node* get_Process(char *name)
                 temp = temp->next;
             }
         }
-    }
-    else if (process_Kill[hash_value]!=NULL)
-    {
-        temp = process_Kill[hash_value];
 
-        while(temp!=NULL)
+        if(result == NULL)
+            log_Print("No found in Unknown.\n");
+        else
+            log_Print("Got process in Unknown.\n");
+    }
+
+    if(process_Kill[hash_value]!=NULL)
+    {
+        struct process_Node* temp = process_Kill[hash_value];
+        struct process_Node* headpt = process_Kill[hash_value];
+
+        if(strcmp(name,temp->name)==0)
+        {
+            result = temp;
+        }
+        else
+        {
+            temp = temp->next;
+        }
+
+        while(temp!=headpt)
         {
             if(strcmp(name,temp->name)==0)
             {
@@ -150,12 +196,28 @@ struct process_Node* get_Process(char *name)
                 temp = temp->next;
             }
         }
-    }
-    else if (process_Eliminate[hash_value]!=NULL)
-    {
-        temp = process_Eliminate[hash_value];
 
-        while(temp!=NULL)
+        if(result == NULL)
+            log_Print("No found in Kill.\n");
+        else
+            log_Print("Got process in Kill.\n");
+    }
+
+    if(process_Eliminate[hash_value]!=NULL)
+    {
+        struct process_Node* temp = process_Eliminate[hash_value];
+        struct process_Node* headpt = process_Eliminate[hash_value];
+
+        if(strcmp(name,temp->name)==0)
+        {
+            result = temp;
+        }
+        else
+        {
+            temp = temp->next;
+        }
+
+        while(temp!=headpt)
         {
             if(strcmp(name,temp->name)==0)
             {
@@ -167,15 +229,14 @@ struct process_Node* get_Process(char *name)
                 temp = temp->next;
             }
         }
-    }
-    else
-    {
-        log_Print("Failed to get process.\n");
+
+        if(result == NULL)
+            log_Print("No found in Eliminate.\n");
+        else
+            log_Print("Got process in Eliminate.\n");
     }
 
-    log_Print("Process got.\n");
-
-    return temp;
+    return result;
 }
 
 //Get pid of process according to its name from the four process_Node* List
@@ -208,7 +269,7 @@ void table_Update_Pid(pid_t length)
 
     struct process_Node* temp;
 
-    for(int i = 1;i<=length;i++)
+    for(int i = 1;i<length;i++)
     {
         temp = get_Process(process_List[i].name);
 
@@ -244,13 +305,18 @@ void print_List(struct process_Node**table,char*path)
         if(table[i]!=NULL)
         {
             struct process_Node* temp = table[i];
+            struct process_Node* headpt = table[i];
 
-            while(temp!=NULL)
+            do
             {
-                fprintf(fp,"%s\n",temp->name);
+                if(strlen(temp->name)>0)
+                {
+                    fprintf(fp,"%s\n",temp->name);
+                }
 
                 temp = temp->next;
             }
+            while(temp!=headpt);
         }
     }
 
@@ -343,6 +409,7 @@ struct process_Node* remove_From_Unknown(char* name)
     else
     {
         struct process_Node*temp = process_Unknown[hash_value];
+        struct process_Node*headpt = process_Unknown[hash_value];
 
         if(strcmp(temp->name,name)==0)
         {
@@ -353,12 +420,14 @@ struct process_Node* remove_From_Unknown(char* name)
         }
         else
         {
-            while(temp!=NULL&&strcmp(temp->name,name)!=0)
+            temp = temp->next;
+
+            while(temp!=headpt&&(strcmp(temp->name,name)!=0))
             {
                 temp= temp->next;
             }
 
-            if(temp == NULL || strcmp(temp->name,name)!=0)
+            if(temp == headpt || strcmp(temp->name,name)!=0)
             {
                 log_Print("Remove from unknown failure.\n");
                 result =  NULL;
@@ -376,6 +445,7 @@ struct process_Node* remove_From_Unknown(char* name)
     return result;
 }
 
+
 void insert_To_Table(struct process_Node*pro,struct process_Node* destination[SIZE_OF_HASH_TABLE])
 {
     int hash_value = hashing_Process(pro->name);
@@ -383,7 +453,7 @@ void insert_To_Table(struct process_Node*pro,struct process_Node* destination[SI
     if(destination[hash_value]==NULL)
     {
         pro->hash_Value = hash_value;
-
+        pro->next = pro;
         pro->previous = pro;
         destination[hash_value] = pro;
     }
@@ -394,6 +464,7 @@ void insert_To_Table(struct process_Node*pro,struct process_Node* destination[SI
         pro->hash_Value = hash_value;
 
         pro->previous = headpt->previous;
+        pro->next = headpt;
 
         headpt->previous->next = pro;
         headpt->previous = pro;
