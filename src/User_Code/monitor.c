@@ -15,7 +15,6 @@ static void syscall_get_Process_Info(void)
     if(process_count!=0)
     {
         log_Print("Failed to get list of prcesses.\n");
-        exit(-2);
     }
     else
     {
@@ -56,7 +55,6 @@ static void kernel_Module_Load()
     else
     {
         log_Print("Failed to load system call module\n");
-        exit(-1);
     }
 }
 
@@ -80,7 +78,6 @@ static void kernel_Module_Remove()
     else
     {
         log_Print("Failed to unload system call module.\n");
-        exit(-3);
     }
 
 }
@@ -137,13 +134,7 @@ int main(int args, char **argv)
 
     table_Update_Pid(process_List[0].pid);
 
-    print_Four_List();
-
-    char ppp[200];
-
-    sprintf(ppp,"%s/%s",path_Root,"log/process_List");
-
-    process_List_Print_To_File(process_List[0].pid,ppp);
+    finalizing_classification();
 
     return 0;
 }

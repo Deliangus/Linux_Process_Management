@@ -76,7 +76,6 @@ int load_List(char*path,struct process_Node* destination[SIZE_OF_HASH_TABLE])
             else
             {
                 log_Print("Failed to load list\n");
-                exit(-1);
             }
         }
     }
@@ -87,10 +86,96 @@ int load_List(char*path,struct process_Node* destination[SIZE_OF_HASH_TABLE])
     }
 }
 
-//Get process_Node from the four hast tables
+//Get process_Node from the four hash tables
 struct process_Node* get_Process(char *name)
 {
-    //TO DO
+    log_Print("Getting process.");
+    log_Print(name);
+    log_Print("\n");
+
+    int hash_value = hashing_Process(name);
+
+    struct process_Node* temp;
+    struct process_Node* result;
+
+    result = NULL;
+
+    if(process_White_List[hash_value]!=NULL)
+    {
+        temp = process_White_List[hash_value];
+
+        while(temp!=NULL)
+        {
+            if(strcmp(name,temp->name)==0)
+            {
+                result = temp;
+                break;
+            }
+            else
+            {
+                temp = temp->next;
+            }
+        }
+    }
+    else if(process_Unknown[hash_value]!=NULL)
+    {
+        temp = process_Unknown[hash_value];
+
+        while(temp!=NULL)
+        {
+            if(strcmp(name,temp->name)==0)
+            {
+                result = temp;
+                break;
+            }
+            else
+            {
+                temp = temp->next;
+            }
+        }
+    }
+    else if (process_Kill[hash_value]!=NULL)
+    {
+        temp = process_Kill[hash_value];
+
+        while(temp!=NULL)
+        {
+            if(strcmp(name,temp->name)==0)
+            {
+                result = temp;
+                break;
+            }
+            else
+            {
+                temp = temp->next;
+            }
+        }
+    }
+    else if (process_Eliminate[hash_value]!=NULL)
+    {
+        temp = process_Eliminate[hash_value];
+
+        while(temp!=NULL)
+        {
+            if(strcmp(name,temp->name)==0)
+            {
+                result = temp;
+                break;
+            }
+            else
+            {
+                temp = temp->next;
+            }
+        }
+    }
+    else
+    {
+        log_Print("Failed to get process.\n");
+    }
+
+    log_Print("Process got.\n");
+
+    return temp;
 }
 
 //Get pid of process according to its name from the four process_Node* List
@@ -127,75 +212,78 @@ void table_Update_Pid(pid_t length)
     {
         temp = get_Process(process_List[i].name);
 
-        temp->pid = process_List[i].pid;
+        if(temp!=NULL)
+        {
+            temp->pid = process_List[i].pid;
+        }
+        else
+        {
+            temp = (struct process_Node*)malloc(sizeof(struct process_Node));
+
+            strcpy(temp->name,process_List[i].name);
+            temp->pid = process_List[i].pid;
+            temp->type = type_UKNOWN;
+
+            insert_To_Table(temp,process_Unknown);
+        }
     }
 
     log_Print("Pid Updated\n");
 }
 
-void print_List(struct process_Node**table)
+void print_List(struct process_Node**table,char*path)
 {
+    FILE *fp = fopen(path,"w");
+
     log_Print("Printing table.\n");
 
     int i = 0;
-
-    int count = 0;
-
-    char info[100];
 
     for(i = 0;i<SIZE_OF_HASH_TABLE;i++)
     {
         if(table[i]!=NULL)
         {
             struct process_Node* temp = table[i];
-            
-            sprintf(info,"%s\t%d\n",temp->name,temp->pid);
 
-            log_Print(info);
-
-            count++;
-
-            temp = temp->next;
-
-            while(temp!=table[i]&&temp!=NULL)
+            while(temp!=NULL)
             {
-                count++;
-
-                sprintf(info,"%s\t%d\n",temp->name,temp->pid);
-
-                log_Print(info);
+                fprintf(fp,"%s\n",temp->name);
 
                 temp = temp->next;
             }
         }
     }
 
-    sprintf(info,"%s\t%d\n","Table printed.\t",count);
+    log_Print("Table printed\n");
 
-    log_Print(info);
+    fclose(fp);
 }
 
 void print_Four_List()
 {
     log_Print("Printing white list and pid.\n");
 
-    print_List(process_White_List);
+    print_List(process_White_List,PATH_TO_PROCESS_WHITE_LIST);
 
     log_Print("Printing kill list and pid.\n");
 
-    print_List(process_Kill);
+    print_List(process_Kill,PATH_TO_PROCESS_KILL);
 
     log_Print("Printing unknown list and pid.\n");
 
-    print_List(process_Unknown);
+    print_List(process_Unknown,PATH_TO_PROCESS_UNKNOWN);
 
     log_Print("Printing eliminate list and pid.\n");
 
-    print_List(process_Eliminate);
+    print_List(process_Eliminate,PATH_TO_PROCESS_ELIMINATE);
+
+    print_List(process_Unknown,PATH_TO_PROCESS_DEFINED);
 }
 
 void apply_Process_Defined()
 {
+    log_Print("Applying process defined.\n");
+
     FILE* fp = fopen(PATH_TO_PROCESS_DEFINED,"r");
 
     if(fp!=NULL)
@@ -205,18 +293,22 @@ void apply_Process_Defined()
     
         while(EOF!=fscanf(fp, "%s %c", buff,&define_Type))
         {
+            log_Print(buff);
+            log_Print("----");
+            putchar(define_Type);
+            putchar('\n');
             if(strlen(buff)>0)
             {
-                if(define_Type != 'U')
+                if(define_Type != type_UKNOWN)
                 {
                     struct process_Node* temp = remove_From_Unknown(buff);
                     temp->type = define_Type;
 
-                    if (define_Type = 'W')
+                    if (define_Type == type_WHITE)
                         insert_To_Table(temp,process_White_List);
-                    else if(define_Type == 'K')
+                    else if(define_Type == type_KILL)
                         insert_To_Table(temp,process_Kill);
-                    else if(define_Type == 'E')
+                    else if(define_Type == type_ELIMINATE)
                         insert_To_Table(temp,process_Eliminate);
                     else
                         log_Print("Input error in process_Defined\n");
@@ -229,6 +321,8 @@ void apply_Process_Defined()
         log_Print("Faild to apply process defined, file open failure\n");
         log_Print(PATH_TO_PROCESS_DEFINED);
     }
+
+    log_Print("Applied process defined.\n");
 }
 
 void remove_From_Tables(char* name)
@@ -238,7 +332,48 @@ void remove_From_Tables(char* name)
 
 struct process_Node* remove_From_Unknown(char* name)
 {
-    //TO DO
+    int hash_value = hashing_Process(name);
+
+    struct process_Node* result = NULL;
+
+    if(process_Unknown[hash_value]==NULL)
+    {
+        log_Print("Remove from unknown failure.\n");
+    }
+    else
+    {
+        struct process_Node*temp = process_Unknown[hash_value];
+
+        if(strcmp(temp->name,name)==0)
+        {
+            temp->next->previous = temp->previous;
+            process_Unknown[hash_value] = temp->next;
+
+            result = temp;
+        }
+        else
+        {
+            while(temp!=NULL&&strcmp(temp->name,name)!=0)
+            {
+                temp= temp->next;
+            }
+
+            if(temp == NULL || strcmp(temp->name,name)!=0)
+            {
+                log_Print("Remove from unknown failure.\n");
+                result =  NULL;
+            }
+            else
+            {
+                temp->next->previous = temp->previous;
+                temp->previous->next = temp->next;
+
+                result = temp;
+            }
+        }
+    }
+
+    return result;
 }
 
 void insert_To_Table(struct process_Node*pro,struct process_Node* destination[SIZE_OF_HASH_TABLE])
@@ -263,4 +398,9 @@ void insert_To_Table(struct process_Node*pro,struct process_Node* destination[SI
         headpt->previous->next = pro;
         headpt->previous = pro;
     }
+}
+
+void finalizing_classification()
+{
+    print_Four_List();
 }

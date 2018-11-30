@@ -19,6 +19,11 @@
 #define TYPE_MARK_POSITION type_Mark_Postion
 #define LENGTH_PROCESS_NAME 50
 
+#define type_WHITE 'W'
+#define type_UKNOWN 'U'
+#define type_KILL 'K'
+#define type_ELIMINATE 'E'
+
 int type_Mark_Postion;
 
 char path_Table_White_List[200];
@@ -64,7 +69,7 @@ union process_Type get_Process_Type(char *name);
 
 void table_Update_Pid(pid_t);
 
-void print_List(struct process_Node**);
+void print_List(struct process_Node**,char*);
 
 void print_Four_List();
 
@@ -75,3 +80,5 @@ void remove_From_Tables(char*);
 struct process_Node* remove_From_Unknown(char*);
 
 void insert_To_Table(struct process_Node*,struct process_Node*[SIZE_OF_HASH_TABLE]);
+
+void finalizing_classification();

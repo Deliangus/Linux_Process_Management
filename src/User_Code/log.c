@@ -19,7 +19,6 @@ void log_Output_Initialize(char*path_Root)
     if(log_Output==NULL)
     {
         log_Print_To_Terminal("Failed to open log file\n");
-        exit(-4);
     }
     else
     {

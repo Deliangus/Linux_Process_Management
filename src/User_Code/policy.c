@@ -107,8 +107,3 @@ void execute_Eliminate(pid_t pid)
 {
     //TO DO
 }
-
-int update_Process_Unknown()
-{
-    //TO DO
-}
