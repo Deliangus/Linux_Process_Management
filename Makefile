@@ -17,7 +17,7 @@ all: $(USR_EXE) $(SYSCALL) $(LOG)
 
 $(USR_EXE) : $(USC_OBJ)
 	mkdir -p $(BIN)
-	$(CC) $^ -o $@ $(LDFLAGS)
+	$(CC) $^ -o $@ $(LDFLAGS) -lrt -lpthread
 
 $(SYSCALL):
 	$(MAKE) -C $(KDIR) M=$(KNL) modules

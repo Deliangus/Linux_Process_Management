@@ -10,10 +10,11 @@ void load()
     log_Print("Loading process policies.\n");
 
     //Initialize process tables
-    memset(process_White_List,0,SIZE_OF_HASH_TABLE);
-    memset(process_Unknown,0,SIZE_OF_HASH_TABLE);
-    memset(process_Kill,0,SIZE_OF_HASH_TABLE);
-    memset(process_Eliminate,0,SIZE_OF_HASH_TABLE);
+
+    memset(process_White_List,0,sizeof(struct process_Node*)*SIZE_OF_HASH_TABLE);
+    memset(process_Unknown,0,sizeof(struct process_Node*)*SIZE_OF_HASH_TABLE);
+    memset(process_Kill,0,sizeof(struct process_Node*)*SIZE_OF_HASH_TABLE);
+    memset(process_Eliminate,0,sizeof(struct process_Node*)*SIZE_OF_HASH_TABLE);
 
     log_Print("Tables intialized.\n");
 
@@ -77,7 +78,7 @@ int load_List(char*path,struct process_Node* destination[SIZE_OF_HASH_TABLE])
             }
             else
             {
-                log_Print("Failed to load list\n");
+                log_Print_To_File("Failed to load list\n");
             }
         }
     }
@@ -91,14 +92,7 @@ int load_List(char*path,struct process_Node* destination[SIZE_OF_HASH_TABLE])
 //Get process_Node from the four hash tables
 struct process_Node* get_Process(char *name)
 {
-    log_Print("Getting process:\t");
-    log_Print(name);
-    log_Print("\n");
-
     int hash_value = hashing_Process(name);
-
-    log_Print(name);
-    printf("\t%d\n",hash_value);
     
     struct process_Node* result;
 
@@ -131,10 +125,7 @@ struct process_Node* get_Process(char *name)
             }
         }
 
-        if(result == NULL)
-            log_Print("No found in White list.\n");
-        else
-            log_Print("Got process in White list.\n");
+        return result;
     }
 
     if(process_Unknown[hash_value]!=NULL)
@@ -163,11 +154,6 @@ struct process_Node* get_Process(char *name)
                 temp = temp->next;
             }
         }
-
-        if(result == NULL)
-            log_Print("No found in Unknown.\n");
-        else
-            log_Print("Got process in Unknown.\n");
     }
 
     if(process_Kill[hash_value]!=NULL)
@@ -197,10 +183,6 @@ struct process_Node* get_Process(char *name)
             }
         }
 
-        if(result == NULL)
-            log_Print("No found in Kill.\n");
-        else
-            log_Print("Got process in Kill.\n");
     }
 
     if(process_Eliminate[hash_value]!=NULL)
@@ -229,11 +211,6 @@ struct process_Node* get_Process(char *name)
                 temp = temp->next;
             }
         }
-
-        if(result == NULL)
-            log_Print("No found in Eliminate.\n");
-        else
-            log_Print("Got process in Eliminate.\n");
     }
 
     return result;
@@ -257,17 +234,13 @@ pid_t get_Process_Pid(char* name)
     return pid;
 }
 
-//Get action to do with process given its name
-union process_Type get_Process_Type(char *name)
+int table_Update_Pid(pid_t length)
 {
-    //TO DO
-}
-
-void table_Update_Pid(pid_t length)
-{
-    log_Print("Updating pid to tables\n");
+    log_Print_To_File("Updating pid to tables\n");
 
     struct process_Node* temp;
+
+    int result = 0;
 
     for(int i = 1;i<length;i++)
     {
@@ -276,6 +249,26 @@ void table_Update_Pid(pid_t length)
         if(temp!=NULL)
         {
             temp->pid = process_List[i].pid;
+            if(temp->type == type_ELIMINATE)
+            {
+                result |= 0b0100;
+            }
+            else if (temp->type==type_KILL)
+            {
+                result |= 0b0010;
+            }
+            else if(temp->type == type_WHITE)
+            {
+                result |= 0b1000;
+            }
+            else if(temp->type == type_UKNOWN)
+            {
+                result |= 0001;
+            }
+            else
+            {
+                log_Print_To_File("Error updating pid\n");
+            }
         }
         else
         {
@@ -286,17 +279,18 @@ void table_Update_Pid(pid_t length)
             temp->type = type_UKNOWN;
 
             insert_To_Table(temp,process_Unknown);
+            result |=0b0001;
         }
     }
 
-    log_Print("Pid Updated\n");
+    return result;
 }
 
 void print_List(struct process_Node**table,char*path)
 {
     FILE *fp = fopen(path,"w");
 
-    log_Print("Printing table.\n");
+    log_Print_To_File("Printing table.\n");
 
     int i = 0;
 
@@ -320,26 +314,62 @@ void print_List(struct process_Node**table,char*path)
         }
     }
 
-    log_Print("Table printed\n");
+    log_Print_To_File("Table printed\n\n");
 
     fclose(fp);
 }
 
-void print_Four_List()
+void print_List_Terminal(struct process_Node**table,char*path)
 {
-    log_Print("Printing white list and pid.\n");
+    FILE *fp = fopen(path,"w");
+
+    log_Print_To_File("Printing table.\n");
+    printf("Printing table.\n");
+
+    int i = 0;
+
+    for(i = 0;i<SIZE_OF_HASH_TABLE;i++)
+    {
+        if(table[i]!=NULL)
+        {
+            struct process_Node* temp = table[i];
+            struct process_Node* headpt = table[i];
+
+            do
+            {
+                if(strlen(temp->name)>0)
+                {
+                    fprintf(fp,"%s\n",temp->name);
+                    printf("%d\t%s\n",temp->pid,temp->name);
+                }
+
+                temp = temp->next;
+            }
+            while(temp!=headpt);
+        }
+    }
+
+    log_Print_To_File("Table printed\n");
+    log_Print_To_File("Table printed\n");
+    
+    fclose(fp);
+}
+
+void* print_Four_List()
+{
+    log_Print_To_File("Printing white list and pid.\n");
 
     print_List(process_White_List,PATH_TO_PROCESS_WHITE_LIST);
 
-    log_Print("Printing kill list and pid.\n");
+    log_Print_To_File("Printing kill list and pid.\n");
 
     print_List(process_Kill,PATH_TO_PROCESS_KILL);
 
-    log_Print("Printing unknown list and pid.\n");
+    log_Print_To_File("Printing unknown list and pid.\n");
 
     print_List(process_Unknown,PATH_TO_PROCESS_UNKNOWN);
 
-    log_Print("Printing eliminate list and pid.\n");
+    log_Print_To_File("Printing eliminate list and pid.\n");
 
     print_List(process_Eliminate,PATH_TO_PROCESS_ELIMINATE);
 
@@ -348,7 +378,7 @@ void print_Four_List()
 
 void apply_Process_Defined()
 {
-    log_Print("Applying process defined.\n");
+    log_Print_To_File("Applying process defined.\n");
 
     FILE* fp = fopen(PATH_TO_PROCESS_DEFINED,"r");
 
@@ -359,8 +389,8 @@ void apply_Process_Defined()
     
         while(EOF!=fscanf(fp, "%s %c", buff,&define_Type))
         {
-            log_Print(buff);
-            log_Print("----");
+            log_Print_To_File(buff);
+            log_Print_To_File("----");
             putchar(define_Type);
             putchar('\n');
             if(strlen(buff)>0)
@@ -377,18 +407,18 @@ void apply_Process_Defined()
                     else if(define_Type == type_ELIMINATE)
                         insert_To_Table(temp,process_Eliminate);
                     else
-                        log_Print("Input error in process_Defined\n");
+                        log_Print_To_File("Input error in process_Defined\n");
                 }
             }
         }
     }
     else
     {
-        log_Print("Faild to apply process defined, file open failure\n");
-        log_Print(PATH_TO_PROCESS_DEFINED);
+        log_Print_To_File("Faild to apply process defined, file open failure\n");
+        log_Print_To_File(PATH_TO_PROCESS_DEFINED);
     }
 
-    log_Print("Applied process defined.\n");
+    log_Print_To_File("Applied process defined.\n");
 }
 
 void remove_From_Tables(char* name)
@@ -404,7 +434,7 @@ struct process_Node* remove_From_Unknown(char* name)
 
     if(process_Unknown[hash_value]==NULL)
     {
-        log_Print("Remove from unknown failure.\n");
+        log_Print_To_File("Remove from unknown failure.\n");
     }
     else
     {
@@ -429,7 +459,7 @@ struct process_Node* remove_From_Unknown(char* name)
 
             if(temp == headpt || strcmp(temp->name,name)!=0)
             {
-                log_Print("Remove from unknown failure.\n");
+                log_Print_To_File("Remove from unknown failure.\n");
                 result =  NULL;
             }
             else
@@ -448,6 +478,10 @@ struct process_Node* remove_From_Unknown(char* name)
 
 void insert_To_Table(struct process_Node*pro,struct process_Node* destination[SIZE_OF_HASH_TABLE])
 {
+    log_Print_To_File("Inserted.\t");
+    log_Print_To_File(pro->name);
+    log_Print_To_File("\n");
+
     int hash_value = hashing_Process(pro->name);
 
     if(destination[hash_value]==NULL)

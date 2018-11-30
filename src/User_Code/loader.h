@@ -14,6 +14,7 @@
 #define PATH_TO_PROCESS_KILL path_Table_Kill
 #define PATH_TO_PROCESS_ELIMINATE path_Table_Eliminate
 #define PATH_TO_PROCESS_DEFINED path_Table_Defined
+#define PATH_TO_PROCESS_LIST path_To_Process_List
 
 #define SIZE_OF_HASH_TABLE 512
 #define TYPE_MARK_POSITION type_Mark_Postion
@@ -31,6 +32,7 @@ char path_Table_Unknown[200];
 char path_Table_Kill[200];
 char path_Table_Eliminate[200];
 char path_Table_Defined[200];
+char path_To_Process_List[200];
 
 struct process_Node
 {
@@ -65,13 +67,12 @@ struct process_Node* get_Process(char *name);
 
 pid_t get_Process_Pid(char *name);
 
-union process_Type get_Process_Type(char *name);
-
-void table_Update_Pid(pid_t);
+int table_Update_Pid(pid_t);
 
 void print_List(struct process_Node**,char*);
+void print_List_Terminal(struct process_Node**table,char*path);
 
-void print_Four_List();
+void* print_Four_List();
 
 void apply_Process_Defined();
 

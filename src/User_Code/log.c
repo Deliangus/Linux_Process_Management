@@ -2,6 +2,8 @@
 
 void log_Output_Initialize(char*path_Root)
 {
+    log_Print_To_Terminal("Initializing log.\n");
+
     FILE* log_Output;
 
     log_Output = NULL;
@@ -31,16 +33,34 @@ void log_Output_Initialize(char*path_Root)
 
 void log_Print_To_Terminal(char*string)
 {
-    printf("%s\n",string);
+    sem_wait(&sem_mutex_log);
+    printf("%s",string);
+    sem_post(&sem_mutex_log);
+}
+
+void log_Print_To_File(char*string)
+{
+    sem_wait(&sem_mutex_log);
+
+    FILE *fp = fopen(log_Path,"a");
+
+    fprintf(fp,"%s",string);
+
+    fclose(fp);
+
+    sem_post(&sem_mutex_log);
 }
 
 void log_Print(char*string)
 {
+    sem_wait(&sem_mutex_log);
 
     FILE *fp = fopen(log_Path,"a");
 
-    printf("%s",string);
     fprintf(fp,"%s",string);
+    printf("%s",string);
 
     fclose(fp);
+
+    sem_post(&sem_mutex_log);
 }

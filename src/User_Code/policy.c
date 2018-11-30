@@ -31,17 +31,23 @@ int apply_Process_Kill()
         {
             struct process_Node* temp = process_Kill[i];
             
-            execute_Kill(temp->pid);
-
-            count++;
-
-            temp = temp->next;
-
-            while(temp!=process_Kill[i]&&temp!=NULL)
+            if(temp->pid>0)
             {
                 execute_Kill(temp->pid);
 
                 count++;
+            }
+
+            temp = temp->next;
+
+            while(temp!=process_Kill[i])
+            {
+                if(temp->pid>0)
+                {
+                    execute_Kill(temp->pid);
+
+                    count++;
+                }
 
                 temp = temp->next;
             }
@@ -64,17 +70,21 @@ int apply_Process_Eliminate()
         {
             struct process_Node* temp = process_Kill[i];
             
-            execute_Eliminate(temp->pid);
-
-            count++;
+            if(temp->pid>0)
+            {
+                execute_Eliminate(temp->pid);
+                count++;
+            }
 
             temp = temp->next;
 
             while(temp!=process_Kill[i]&&temp!=NULL)
             {
-                execute_Eliminate(temp->pid);
-
-                count++;
+                if(temp->pid>0)
+                {
+                    execute_Eliminate(temp->pid);
+                    count++;
+                }
 
                 temp = temp->next;
             }
@@ -88,22 +98,23 @@ void execute_Kill(pid_t pid)
 {
     char instruction [50];
 
-    sprintf(instruction, "suod kill %d", pid);
+    sprintf(instruction, "sudo kill %d", pid);
 
     int shell = system(instruction);
 
     if(shell==0)
     {
-        //log_Print("Process\t%u\t%s has been killed\n",pid);
+        //log_Print_To_File("Process\t%u\t%s has been killed\n",pid);
 
     }
     else
     {
-        //log_Print("Failed: kill process\t%u\t%s\n.",pid);
+        //log_Print_To_File("Failed: kill process\t%u\t%s\n.",pid);
     }
 }
 
 void execute_Eliminate(pid_t pid)
 {
     //TO DO
+    printf("Execute Eliminate has not been implemented\n");
 }
