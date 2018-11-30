@@ -1,3 +1,10 @@
+/*
+loader.h
+
+Created by Yuxiang Luo on long long time ago.
+
+Copyright @ 2018 Yuxiang Luo, Jonathan Karkour, Matt. All right reserved.
+*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
