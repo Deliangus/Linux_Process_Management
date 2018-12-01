@@ -17,7 +17,7 @@ static struct process process_List[512];
 static unsigned long syscall_getProcess(const struct process* user_List)
 {
 	struct task_struct * p;
-	int counter = 1;
+	int counter = 
 	unsigned long status;
 
 	p = NULL;
